@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Actividades Semanales Petrolera Roraima</title>
+    <!-- Tailwind CSS CDN for 100% responsive modern styling across iOS, Android, and PC -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        roraima: { 50: '#eff6ff', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for mobile responsiveness on tables */
+        .table-container::-webkit-scrollbar { height: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 flex flex-col justify-between">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8 lg:p-10 w-full">
+        
+        <!-- Header Section -->
+        <div class="border-b border-slate-200 pb-6 mb-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <span class="inline-block bg-roraima-50 text-roraima-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Petrolera Roraima</span>
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Reporte de Actividades Semanales</h1>
+                <p class="text-sm text-slate-500 mt-1">Plataforma de registro y control operativo corporativo</p>
+            </div>
+            <div class="w-full sm:w-auto bg-slate-50 border border-slate-200 p-3 rounded-xl text-center">
+                <span class="block text-xs font-medium text-slate-400 uppercase">Periodo Actual (Sáb - Vie)</span>
+                <input type="text" id="semana" readonly class="bg-transparent font-bold text-slate-700 text-center w-full focus:outline-none text-sm">
+            </div>
+        </div>
+
+        <!-- Master Header Form Inputs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            <div>
+                <label for="area" class="block text-sm font-semibold text-slate-700 mb-1">Área <span class="text-red-500">*</span></label>
+                <select id="area" onchange="actualizarGerencias()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-roraima-600 focus:outline-none transition">
+                    <option value="">Seleccione el área...</option>
+                    <option value="Mejorador">Mejorador</option>
+                    <option value="Producción">Producción</option>
+                    <option value="Apoyo/Habilitante">Apoyo/Habilitante</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="gerencia" class="block text-sm font-semibold text-slate-700 mb-1">Gerencia <span class="text-red-500">*</span></label>
+                <select id="gerencia" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-roraima-600 focus:outline-none transition" disabled>
+                    <option value="">Primero seleccione un área...</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="gerente" class="block text-sm font-semibold text-slate-700 mb-1">Nombre del Gerente <span class="text-red-500">*</span></label>
+                <input type="text" id="gerente" placeholder="Ej. Juan Pérez" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-roraima-600 focus:outline-none transition">
+            </div>
+        </div>
+
+        <!-- Activities Section -->
+        <div class="mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <h2 class="text-lg font-bold text-slate-800">Listado de Actividades</h2>
+                <button type="button" onclick="agregarFila()" class="w-full sm:w-auto bg-roraima-600 hover:bg-roraima-700 text-white font-medium text-sm px-4 py-2.5 rounded-lg shadow-sm transition flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Agregar Actividad
+                </button>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="table-container border border-slate-200 rounded-xl overflow-x-auto shadow-inner bg-white">
+                <table id="tablaActividades" class="w-full text-left border-collapse min-w-[750px]">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                            <th class="p-3.5">Renglón</th>
+                            <th class="p-3.5">Descripción de la Actividad</th>
+                            <th class="p-3.5">Estatus</th>
+                            <th class="p-3.5">Impacto</th>
+                            <th class="p-3.5">Adjuntar Imagen</th>
+                            <th class="p-3.5 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <!-- Dynamic rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Submit Button Footer -->
+        <div class="mt-8 pt-6 border-t border-slate-200 flex justify-end">
+            <button type="button" id="btnEnviar" onclick="confirmarYEnviar()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 text-base flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Enviar Reporte Completo
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Footer requested -->
+    <footer class="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-500 py-4 border-t border-slate-200 w-full">
+        Gestión Operacional - Gerencia de Planificación
+    </footer>
+
+<script>
+    // Gerencias mapped by Area
+    const gerenciasPorArea = {
+        "Apoyo/Habilitante": [
+            "SSGG", "PPyG", "SIHO-A", "Ingeniería de Costos", 
+            "Recursos Humanos", "Propiedades y Catastro", "Legales", 
+            "AIT (Mejorador)", "DSI", "Procura y Contratación", 
+            "Relaciones Gubernamentales", "AIT (Producción)", 
+            "AAPP", "Finanzas", "Desarrollo Social", "Salud"
+        ].sort(),
+        "Producción": [
+            "Operaciones Producción", "RMH", "Mantenimiento de Producción", 
+            "GIPS Producción", "Servicios Eléctricos", "Perforación", 
+            "Transporte", "Yacimientos", "Optimización", "Producción", 
+            "Gerencia Tecnica", "Planta de Gas y Vapor"
+        ].sort(),
+        "Mejorador": [
+            "Mejorador Manejo de Sólidos", "Mejorador Operaciones", 
+            "Mejorador GIPS", "Mejorador Mantenimiento", 
+            "Mejorador SSTT", "Mejoramiento"
+        ].sort()
+    };
+
+    function actualizarGerencias() {
+        const areaSelect = document.getElementById("area");
+        const gerenciaSelect = document.getElementById("gerencia");
+        const selectedArea = areaSelect.value;
+
+        gerenciaSelect.innerHTML = "";
+
+        if (!selectedArea) {
+            gerenciaSelect.innerHTML = '<option value="">Primero seleccione un área...</option>';
+            gerenciaSelect.disabled = true;
+            return;
+        }
+
+        gerenciaSelect.disabled = false;
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.text = "Seleccione la gerencia...";
+        gerenciaSelect.appendChild(defaultOption);
+
+        const lista = gerenciasPorArea[selectedArea] || [];
+        lista.forEach(gerencia => {
+            const opt = document.createElement("option");
+            opt.value = gerencia;
+            opt.text = gerencia;
+            gerenciaSelect.appendChild(opt);
+        });
+    }
+
+    window.onload = function() {
+        const today = new Date();
+        const d = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+        const currentDayOfWeek = today.getDay();
+        const daysSinceSaturday = (currentDayOfWeek - 6 + 7) % 7;
+        const saturday = new Date(today);
+        saturday.setDate(today.getDate() - daysSinceSaturday);
+
+        const friday = new Date(saturday);
+        friday.setDate(saturday.getDate() + 6);
+
+        const options = { day: 'numeric', month: 'short' };
+        const satStr = saturday.toLocaleDateString('es-ES', options);
+        const friStr = friday.toLocaleDateString('es-ES', options);
+
+        document.getElementById("semana").value = `Semana ${semanaNo} (${satStr} al ${friStr})`;
+        agregarFila();
+    };
+
+    function agregarFila() {
+        const tbody = document.getElementById("tablaActividades").getElementsByTagName("tbody")[0];
+        const nuevaFila = tbody.insertRow();
+        
+        nuevaFila.innerHTML = `
+            <td class="p-3.5 align-top">
+                <div class="flex items-center gap-2">
+                    <select class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-roraima-600 focus:outline-none text-slate-700" onchange="actualizarIconoRenglon(this)">
+                        <option value="" disabled selected class="text-slate-300">Seleccione...</option>
+                        <option value="Actividad">Actividad</option>
+                        <option value="Hito">Hito</option>
+                        <option value="Alerta">Alerta</option>
+                    </select>
+                    <span class="renglon-icon text-lg min-w-[24px] text-center" title="Tipo de Renglón"></span>
+                </div>
+            </td>
+            <td class="p-3.5 align-top">
+                <textarea rows="2" placeholder="Describa la actividad..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-roraima-600 focus:outline-none"></textarea>
+            </td>
+            <td class="p-3.5 align-top">
+                <select class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-roraima-600 focus:outline-none">
+                    <option value="Completado">Completado</option>
+                    <option value="En Progreso">En Progreso</option>
+                    <option value="Pendiente">Pendiente</option>
+                </select>
+            </td>
+            <td class="p-3.5 align-top">
+                <input type="text" placeholder="Impacto u observación" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-roraima-600 focus:outline-none">
+            </td>
+            <td class="p-3.5 align-top">
+                <div class="flex flex-col gap-1">
+                    <input type="file" accept="image/*" onchange="procesarArchivoImagen(this)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-roraima-50 file:text-roraima-700 hover:file:bg-roraima-100 cursor-pointer">
+                    <input type="hidden" class="base64-image-input" value="">
+                    <div class="image-preview-container"></div>
+                </div>
+            </td>
+            <td class="p-3.5 align-top text-center">
+                <button type="button" onclick="eliminarFila(this)" class="bg-red-50 hover:bg-red-100 text-red-600 font-medium p-2 rounded-lg transition" title="Eliminar fila">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            </td>
+        `;
+    }
+
+    function actualizarIconoRenglon(select) {
+        const container = select.parentElement.querySelector('.renglon-icon');
+        const val = select.value;
+        if (val === 'Actividad') {
+            container.innerHTML = `<span title="Actividad">📋</span>`;
+        } else if (val === 'Hito') {
+            container.innerHTML = `<span title="Hito" class="text-green-600 font-bold">✅</span>`;
+        } else if (val === 'Alerta') {
+            container.innerHTML = `<span title="Alerta">⚠️</span>`;
+        } else {
+            container.innerHTML = '';
+        }
+    }
+
+    function procesarArchivoImagen(input) {
+        const file = input.files[0];
+        const container = input.parentElement.querySelector('.image-preview-container');
+        const hiddenInput = input.parentElement.querySelector('.base64-image-input');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                hiddenInput.value = base64Data;
+                container.innerHTML = `<img src="${base64Data}" class="h-12 w-auto rounded object-cover mt-1 border border-slate-200">`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            hiddenInput.value = "";
+            container.innerHTML = "";
+        }
+    }
+
+    function eliminarFila(btn) {
+        const row = btn.closest('tr');
+        if(row.parentNode.rows.length > 1) {
+            row.parentNode.removeChild(row);
+        } else {
+            alert("Debe mantener al menos una actividad en el reporte.");
+        }
+    }
+
+    function confirmarYEnviar() {
+        const semana = document.getElementById("semana").value;
+        const area = document.getElementById("area").value;
+        const gerencia = document.getElementById("gerencia").value;
+        const gerente = document.getElementById("gerente").value;
+
+        if(!area || !gerencia || !gerente) {
+            alert("Por favor complete los campos obligatorios de cabecera: Área, Gerencia y Nombre del Gerente.");
+            return;
+        }
+
+        const filas = document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].rows;
+        
+        for (let i = 0; i < filas.length; i++) {
+            const selectRenglon = filas[i].querySelector("select");
+            if (!selectRenglon.value) {
+                alert(`Por favor seleccione el tipo de renglón en la fila ${i + 1}.`);
+                selectRenglon.focus();
+                return;
+            }
+        }
+
+        let cantidadActividades = filas.length;
+        let confirmar = confirm("¿Está de acuerdo con el envío de " + cantidadActividades + " actividades?");
+        if (!confirmar) return;
+
+        let actividadesArray = [];
+
+        for (let i = 0; i < filas.length; i++) {
+            const selects = filas[i].getElementsByTagName("select");
+            const textarea = filas[i].querySelector("textarea");
+            const inputs = filas[i].getElementsByTagName("input");
+            const base64Img = filas[i].querySelector(".base64-image-input").value;
+
+            actividadesArray.push({
+                Renglon: selects[0].value,
+                Actividad: textarea.value,
+                Estatus: selects[1].value,
+                Impacto: inputs[0].value,
+                EvidenciaImagen: base64Img
+            });
+        }
+
+        const payload = {
+            Semana: semana,
+            Area: area,
+            Gerencia: gerencia,
+            Gerente: gerente,
+            Actividades: actividadesArray,
+            FechaEnvio: new Date().toISOString()
+        };
+
+        // CONFIGURACIÓN DE GITHUB PARA BASE DE DATOS DOCUMENTAL
+        const githubUser = "EMPETROLERARORAIMA";
+        const repoName = "EMPETROLERARORAIMA"; // Nombre de tu repositorio
+        const folderPath = "data_reportes"; // Carpeta contenedora en GitHub
+        const fileName = `${area.replace(/[^a-zA-Z0-9]/g, '_')}_${gerencia.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.json`;
+        
+        // Inserta tu Token Personal de GitHub aquí para habilitar el envío directo a la nube
+        const githubToken = "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"; 
+
+        if(githubToken.includes("GITHUB_PERSONAL")) {
+            // Modo local de respaldo si el token no ha sido configurado todavía
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            alert("¡Reporte generado! (Modo local: configure su token de GitHub en el código para almacenamiento automático en la nube).");
+            location.reload();
+            return;
+        }
+
+        const jsonString = JSON.stringify(payload, null, 2);
+        const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
+        const apiUrl = `https://api.github.com/repos/${githubUser}/${repoName}/contents/${folderPath}/${fileName}`;
+
+        // Mostrar indicador de carga en el botón
+        const btnEnviar = document.getElementById("btnEnviar");
+        const textoOriginal = btnEnviar.innerHTML;
+        btnEnviar.disabled = true;
+        btnEnviar.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Enviando a la Base de Datos...
+        `;
+
+        fetch(apiUrl, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${githubToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: `Nuevo reporte semanal: ${gerencia} - ${semana}`,
+                content: contentEncoded
+            })
+        })
+        .then(response => {
+            if(response.ok) {
+                alert("¡Reporte de Actividades Semanales de Petrolera Roraima enviado y registrado exitosamente en la base de datos de GitHub!");
+                location.reload();
+            } else {
+                return response.json().then(err => { throw new Error(err.message || "Error al conectar con la API de GitHub"); });
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error al enviar a GitHub: " + error.message);
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = textoOriginal;
+        });
+    }
+</script>
+
+</body>
+</html>

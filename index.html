@@ -346,12 +346,14 @@ fetch(webhookUrl, {
     body: JSON.stringify(payload)
 })
 .then(() => {
+    // Al completarse el envío, mostramos el éxito directamente
     alert('¡Reporte enviado con éxito!');
-    // Aquí puedes limpiar el formulario o restablecer la vista
-    document.getElementById('tuFormulario').reset();
+    
+    // Opcional: Limpia el formulario para un nuevo reporte
+    document.querySelector('form').reset();
 })
 .catch(error => {
-    console.error('Error en el envío:', error);
+    console.error('Error detallado en el envío:', error);
     alert('Error al enviar el reporte.');
 });
     }

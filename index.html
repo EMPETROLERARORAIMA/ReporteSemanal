@@ -276,41 +276,68 @@
     const semana = document.getElementById("semana").value;
     const area = document.getElementById("area").value;
     const gerencia = document.getElementById("gerencia").value;
-    const gerente = document.getElementById("gerente").value;
+    const gerente = document.getElementById("gerente").value.trim();
 
     if (!area || !gerencia || !gerente) {
-        alert("Por favor complete los campos obligatorios: Área, Gerencia y Nombre del Gerente.");
+        alert(
+            "Complete los campos obligatorios: " +
+            "Área, Gerencia y Nombre del Gerente."
+        );
         return;
     }
 
-    const filas = document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].rows;
+    const filas = document.querySelectorAll(
+        "#tablaActividades tbody tr"
+    );
 
-    for (let i = 0; i < filas.length; i++) {
-        const selectRenglon = filas[i].querySelector("select");
-        if (!selectRenglon.value) {
-            alert(`Seleccione el tipo de renglón en la fila ${i + 1}.`);
-            selectRenglon.focus();
-            return;
-        }
+    if (filas.length === 0) {
+        alert("Agregue al menos una actividad.");
+        return;
     }
-
-    if (!confirm(`¿Está de acuerdo con el envío de ${filas.length} actividades?`)) return;
 
     const actividadesArray = [];
 
     for (let i = 0; i < filas.length; i++) {
-        const selects = filas[i].getElementsByTagName("select");
-        const textarea = filas[i].querySelector("textarea");
-        const inputs = filas[i].getElementsByTagName("input");
-        const base64Img = filas[i].querySelector(".base64-image-input").value;
+        const fila = filas[i];
+        const selects = fila.querySelectorAll("select");
+
+        const renglon = selects[0].value;
+        const actividad = fila.querySelector("textarea").value.trim();
+        const estatus = selects[1].value;
+        const impacto = fila.querySelector(
+            'input[type="text"]'
+        ).value.trim();
+
+        const evidencia = fila.querySelector(
+            ".base64-image-input"
+        ).value;
+
+        if (!renglon) {
+            alert(
+                "Seleccione el tipo de renglón en la fila " +
+                (i + 1) + "."
+            );
+            selects[0].focus();
+            return;
+        }
 
         actividadesArray.push({
-            Renglon: selects[0].value,
-            Actividad: textarea.value,
-            Estatus: selects[1].value,
-            Impacto: inputs[0].value,
-            EvidenciaImagen: base64Img
+            Renglon: renglon,
+            Actividad: actividad,
+            Estatus: estatus,
+            Impacto: impacto,
+            EvidenciaImagen: evidencia
         });
+    }
+
+    const confirmado = confirm(
+        "¿Está de acuerdo con el envío de " +
+        actividadesArray.length +
+        " actividades?"
+    );
+
+    if (!confirmado) {
+        return;
     }
 
     const payload = {
@@ -322,40 +349,33 @@
         FechaEnvio: new Date().toISOString()
     };
 
-    const webhookUrl = "https://script.google.com/macros/s/AKfycbxIsFhfoxGfiCnH_luZHDA-b476avPedBuRGY7FslcaUhDGXGspBoJIo2_63CMxvZV-3w/exec";
+    const webhookUrl =
+        "https://script.google.com/macros/s/AKfycbxIsFhfoxGfiCnH_luZHDA-b476avPedBuRGY7FslcaUhDGXGspBoJIo2_63CMxvZV-3w/exec";
 
-    const btnEnviar = document.getElementById("btnEnviar");
-    const textoOriginal = btnEnviar.innerHTML;
+    const formularioAnterior = document.getElementById(
+        "formularioDiagnostico"
+    );
 
-    btnEnviar.disabled = true;
-    btnEnviar.innerHTML = "Enviando Reporte...";
+    if (formularioAnterior) {
+        formularioAnterior.remove();
+    }
 
-    fetch(webhookUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-    })
-    .then(() => {
-        alert("Reporte enviado. Verifique que el archivo JSON apareció en la carpeta de Google Drive.");
+    const formulario = document.createElement("form");
+    formulario.id = "formularioDiagnostico";
+    formulario.method = "POST";
+    formulario.action = webhookUrl;
+    formulario.target = "_blank";
+    formulario.style.display = "none";
 
-        document.getElementById("area").value = "";
-        document.getElementById("gerencia").innerHTML = '<option value="">Primero seleccione un área...</option>';
-        document.getElementById("gerencia").disabled = true;
-        document.getElementById("gerente").value = "";
-        document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].innerHTML = "";
-        agregarFila();
-    })
-    .catch(error => {
-        console.error(error);
-        alert("Error al enviar el reporte. Verifique su conexión e inténtelo nuevamente.");
-    })
-    .finally(() => {
-        btnEnviar.disabled = false;
-        btnEnviar.innerHTML = textoOriginal;
-    });
+    const campo = document.createElement("input");
+    campo.type = "hidden";
+    campo.name = "data";
+    campo.value = JSON.stringify(payload);
+
+    formulario.appendChild(campo);
+    document.body.appendChild(formulario);
+
+    formulario.submit();
 }
 </script>
 

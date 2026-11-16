@@ -273,115 +273,90 @@
     }
 
     function confirmarYEnviar() {
-        const semana = document.getElementById("semana").value;
-        const area = document.getElementById("area").value;
-        const gerencia = document.getElementById("gerencia").value;
-        const gerente = document.getElementById("gerente").value;
+    const semana = document.getElementById("semana").value;
+    const area = document.getElementById("area").value;
+    const gerencia = document.getElementById("gerencia").value;
+    const gerente = document.getElementById("gerente").value;
 
-        if(!area || !gerencia || !gerente) {
-            alert("Por favor complete los campos obligatorios de cabecera: Área, Gerencia y Nombre del Gerente.");
+    if (!area || !gerencia || !gerente) {
+        alert("Por favor complete los campos obligatorios: Área, Gerencia y Nombre del Gerente.");
+        return;
+    }
+
+    const filas = document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].rows;
+
+    for (let i = 0; i < filas.length; i++) {
+        const selectRenglon = filas[i].querySelector("select");
+        if (!selectRenglon.value) {
+            alert(`Seleccione el tipo de renglón en la fila ${i + 1}.`);
+            selectRenglon.focus();
             return;
         }
-
-        const filas = document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].rows;
-        
-        for (let i = 0; i < filas.length; i++) {
-            const selectRenglon = filas[i].querySelector("select");
-            if (!selectRenglon.value) {
-                alert(`Por favor seleccione el tipo de renglón en la fila ${i + 1}.`);
-                selectRenglon.focus();
-                return;
-            }
-        }
-
-        let cantidadActividades = filas.length;
-        let confirmar = confirm("¿Está de acuerdo con el envío de " + cantidadActividades + " actividades?");
-        if (!confirmar) return;
-
-        let actividadesArray = [];
-
-        for (let i = 0; i < filas.length; i++) {
-            const selects = filas[i].getElementsByTagName("select");
-            const textarea = filas[i].querySelector("textarea");
-            const inputs = filas[i].getElementsByTagName("input");
-            const base64Img = filas[i].querySelector(".base64-image-input").value;
-
-            actividadesArray.push({
-                Renglon: selects[0].value,
-                Actividad: textarea.value,
-                Estatus: selects[1].value,
-                Impacto: inputs[0].value,
-                EvidenciaImagen: base64Img
-            });
-        }
-
-        const payload = {
-            Semana: semana,
-            Area: area,
-            Gerencia: gerencia,
-            Gerente: gerente,
-            Actividades: actividadesArray,
-            FechaEnvio: new Date().toISOString()
-        };
-
-        const webhookUrl = "https://script.google.com/macros/s/AKfycbxIsFhfoxGfiCnH_luZHDA-b476avPedBuRGY7FslcaUhDGXGspBoJIo2_63CMxvZV-3w/exec"; 
-
-        const btnEnviar = document.getElementById("btnEnviar");
-        const textoOriginal = btnEnviar.innerHTML;
-        btnEnviar.disabled = true;
-        btnEnviar.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Enviando Reporte...
-        `;
-
-        // MÉTODO DE FORMULARIO OCULTO (Bypassea el problema de redirección y pérdida de datos de fetch)
-        try {
-            let iframe = document.getElementById('hidden_iframe');
-            if (!iframe) {
-                iframe = document.createElement('iframe');
-                iframe.name = 'hidden_iframe';
-                iframe.id = 'hidden_iframe';
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-            }
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = webhookUrl;
-            form.target = 'hidden_iframe';
-            form.style.display = 'none';
-
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'data';
-            input.value = JSON.stringify(payload);
-            form.appendChild(input);
-
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
-
-            alert('¡Reporte enviado con éxito!');
-            
-            // Limpia el formulario y restablece a una fila inicial
-            document.getElementById("area").value = "";
-            document.getElementById("gerencia").innerHTML = '<option value="">Primero seleccione un área...</option>';
-            document.getElementById("gerencia").disabled = true;
-            document.getElementById("gerente").value = "";
-            document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].innerHTML = "";
-            agregarFila();
-
-        } catch (error) {
-            console.error('Error detallado en el envío:', error);
-            alert('Error al enviar el reporte. Verifique su conexión.');
-        } finally {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = textoOriginal;
-        }
     }
+
+    if (!confirm(`¿Está de acuerdo con el envío de ${filas.length} actividades?`)) return;
+
+    const actividadesArray = [];
+
+    for (let i = 0; i < filas.length; i++) {
+        const selects = filas[i].getElementsByTagName("select");
+        const textarea = filas[i].querySelector("textarea");
+        const inputs = filas[i].getElementsByTagName("input");
+        const base64Img = filas[i].querySelector(".base64-image-input").value;
+
+        actividadesArray.push({
+            Renglon: selects[0].value,
+            Actividad: textarea.value,
+            Estatus: selects[1].value,
+            Impacto: inputs[0].value,
+            EvidenciaImagen: base64Img
+        });
+    }
+
+    const payload = {
+        Semana: semana,
+        Area: area,
+        Gerencia: gerencia,
+        Gerente: gerente,
+        Actividades: actividadesArray,
+        FechaEnvio: new Date().toISOString()
+    };
+
+    const webhookUrl = "https://script.google.com/macros/s/AKfycbxIsFhfoxGfiCnH_luZHDA-b476avPedBuRGY7FslcaUhDGXGspBoJIo2_63CMxvZV-3w/exec";
+
+    const btnEnviar = document.getElementById("btnEnviar");
+    const textoOriginal = btnEnviar.innerHTML;
+
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = "Enviando Reporte...";
+
+    fetch(webhookUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert("Reporte enviado. Verifique que el archivo JSON apareció en la carpeta de Google Drive.");
+
+        document.getElementById("area").value = "";
+        document.getElementById("gerencia").innerHTML = '<option value="">Primero seleccione un área...</option>';
+        document.getElementById("gerencia").disabled = true;
+        document.getElementById("gerente").value = "";
+        document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].innerHTML = "";
+        agregarFila();
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Error al enviar el reporte. Verifique su conexión e inténtelo nuevamente.");
+    })
+    .finally(() => {
+        btnEnviar.disabled = false;
+        btnEnviar.innerHTML = textoOriginal;
+    });
+}
 </script>
 
 </body>

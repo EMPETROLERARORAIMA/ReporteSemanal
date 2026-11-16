@@ -272,7 +272,7 @@
         }
     }
 
-    function confirmarYEnviar() {
+    async function confirmarYEnviar() {
         const semana = document.getElementById("semana").value;
         const area = document.getElementById("area").value;
         const gerencia = document.getElementById("gerencia").value;
@@ -315,7 +315,6 @@
             });
         }
 
-        // Estructura de Payload limpia con todos los datos del reporte
         const payload = {
             Semana: semana,
             Area: area,
@@ -325,10 +324,8 @@
             FechaEnvio: new Date().toISOString()
         };
 
-        // URL DEL WEBHOOK (Aquí conectaremos la automatización sin tokens de por medio)
         const webhookUrl = "https://script.google.com/macros/s/AKfycbxIsFhfoxGfiCnH_luZHDA-b476avPedBuRGY7FslcaUhDGXGspBoJIo2_63CMxvZV-3w/exec"; 
 
-        // Mostrar indicador de carga en el botón
         const btnEnviar = document.getElementById("btnEnviar");
         const textoOriginal = btnEnviar.innerHTML;
         btnEnviar.disabled = true;
@@ -340,22 +337,31 @@
             Enviando Reporte...
         `;
 
-fetch(webhookUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: JSON.stringify(payload)
-})
-.then(() => {
-    // Al completarse el envío, mostramos el éxito directamente
-    alert('¡Reporte enviado con éxito!');
-    
-    // Opcional: Limpia el formulario para un nuevo reporte
-    document.querySelector('form').reset();
-})
-.catch(error => {
-    console.error('Error detallado en el envío:', error);
-    alert('Error al enviar el reporte.');
-});
+        try {
+            await fetch(webhookUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
+
+            alert('¡Reporte enviado con éxito!');
+            
+            // Limpia el formulario y restablece a una fila inicial si se desea
+            document.getElementById("area").value = "";
+            document.getElementById("gerencia").innerHTML = '<option value="">Primero seleccione un área...</option>';
+            document.getElementById("gerencia").disabled = true;
+            document.getElementById("gerente").value = "";
+            document.getElementById("tablaActividades").getElementsByTagName("tbody")[0].innerHTML = "";
+            agregarFila();
+
+        } catch (error) {
+            console.error('Error detallado en el envío:', error);
+            alert('Error al enviar el reporte. Verifique su conexión.');
+        } finally {
+            // Esto se ejecuta siempre, liberando el botón pase lo que pase
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = textoOriginal;
+        }
     }
 </script>
 

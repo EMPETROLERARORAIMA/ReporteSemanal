@@ -327,15 +327,15 @@
 
         // CONFIGURACIÓN DE GITHUB PARA BASE DE DATOS DOCUMENTAL
         const githubUser = "EMPETROLERARORAIMA";
-        const repoName = "ReporteSemanal"; // Nombre de tu repositorio
-        const folderPath = "data_reportes"; // Carpeta contenedora en GitHub
+        const repoName = "ReporteSemanal"; 
+        const folderPath = "data_reportes"; 
         const fileName = `${area.replace(/[^a-zA-Z0-9]/g, '_')}_${gerencia.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.json`;
         
-        // Inserta tu Token Personal de GitHub aquí para habilitar el envío directo a la nube
+        // Inserta tu Token Personal de GitHub aquí
         const githubToken = "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"; 
 
-        if(githubToken.includes("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")) {
-            // Modo local de respaldo si el token no ha sido configurado todavía
+        // Condición corregida: solo se activa si dejamos el texto de prueba "GITHUB_PERSONAL"
+        if(githubToken.includes("EMPETROLERARORAIMA")) {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);

@@ -272,7 +272,7 @@
         }
     }
 
-    async function confirmarYEnviar() {
+    function confirmarYEnviar() {
         const semana = document.getElementById("semana").value;
         const area = document.getElementById("area").value;
         const gerencia = document.getElementById("gerencia").value;
@@ -337,16 +337,32 @@
             Enviando Reporte...
         `;
 
-        // Preparar los datos usando URLSearchParams para evitar bloqueos CORS y asegurar envío completo
-        const formData = new URLSearchParams();
-        formData.append('data', JSON.stringify(payload));
-
+        // MÉTODO DE FORMULARIO OCULTO (Bypassea el problema de redirección y pérdida de datos de fetch)
         try {
-            await fetch(webhookUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            });
+            let iframe = document.getElementById('hidden_iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.name = 'hidden_iframe';
+                iframe.id = 'hidden_iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = webhookUrl;
+            form.target = 'hidden_iframe';
+            form.style.display = 'none';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'data';
+            input.value = JSON.stringify(payload);
+            form.appendChild(input);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
 
             alert('¡Reporte enviado con éxito!');
             
@@ -362,7 +378,6 @@
             console.error('Error detallado en el envío:', error);
             alert('Error al enviar el reporte. Verifique su conexión.');
         } finally {
-            // Esto se ejecuta siempre, liberando el botón pase lo que pase
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = textoOriginal;
         }

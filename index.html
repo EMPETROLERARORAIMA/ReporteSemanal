@@ -337,16 +337,20 @@
             Enviando Reporte...
         `;
 
+        // Preparar los datos usando URLSearchParams para evitar bloqueos CORS y asegurar envío completo
+        const formData = new URLSearchParams();
+        formData.append('data', JSON.stringify(payload));
+
         try {
             await fetch(webhookUrl, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify(payload)
+                body: formData
             });
 
             alert('¡Reporte enviado con éxito!');
             
-            // Limpia el formulario y restablece a una fila inicial si se desea
+            // Limpia el formulario y restablece a una fila inicial
             document.getElementById("area").value = "";
             document.getElementById("gerencia").innerHTML = '<option value="">Primero seleccione un área...</option>';
             document.getElementById("gerencia").disabled = true;

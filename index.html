@@ -341,26 +341,18 @@
         `;
 
         fetch(webhookUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => {
-            if(response.ok || response.status === 202) {
-                alert("¡Reporte de Actividades Semanales enviado exitosamente!");
-                location.reload();
-            } else {
-                throw new Error("Error en la respuesta del servidor (Código: " + response.status + ")");
-            }
-        })
-        .catch(error => {
-            console.error("Detalle técnico del error:", error);
-            alert("Error al enviar el reporte: " + error.message);
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = textoOriginal;
-        });
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify(payload)
+})
+.then(() => {
+    alert('¡Reporte enviado con éxito!');
+    // Agrega aquí la lógica para limpiar el formulario o restablecer la vista
+})
+.catch(error => {
+    console.error('Error en el envío:', error);
+    alert('Error al enviar el reporte.');
+});
     }
 </script>
 

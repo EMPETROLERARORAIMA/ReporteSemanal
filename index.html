@@ -331,11 +331,17 @@
         const folderPath = "data_reportes"; 
         const fileName = `${area.replace(/[^a-zA-Z0-9]/g, '_')}_${gerencia.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.json`;
         
-        // Token configurado directamente (respaldo local eliminado)
         const githubToken = "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"; 
 
+        // Codificación Base64 segura para UTF-8 (soporta tildes y eñes sin error)
         const jsonString = JSON.stringify(payload, null, 2);
-        const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
+        const utf8Bytes = new TextEncoder().encode(jsonString);
+        let binaryString = "";
+        for (let i = 0; i < utf8Bytes.byteLength; i++) {
+            binaryString += String.fromCharCode(utf8Bytes[i]);
+        }
+        const contentEncoded = btoa(binaryString);
+
         const apiUrl = `https://api.github.com/repos/${githubUser}/${repoName}/contents/${folderPath}/${fileName}`;
 
         // Mostrar indicador de carga en el botón
@@ -366,12 +372,14 @@
                 alert("¡Reporte de Actividades Semanales de Petrolera Roraima enviado y registrado exitosamente en la base de datos de GitHub!");
                 location.reload();
             } else {
-                return response.json().then(err => { throw new Error(err.message || "Error al conectar con la API de GitHub"); });
+                return response.json().then(err => { 
+                    throw new Error(`GitHub Error (${response.status}): ${err.message}`); 
+                });
             }
         })
         .catch(error => {
-            console.error("Error:", error);
-            alert("Error al enviar a GitHub: " + error.message);
+            console.error("Detalle técnico del error:", error);
+            alert("Error al enviar a GitHub:\n" + error.message + "\n\n(Tip: Presiona F12 y revisa la pestaña Console si necesitas ver el detalle completo).");
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = textoOriginal;
         });

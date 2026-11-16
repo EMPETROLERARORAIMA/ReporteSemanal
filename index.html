@@ -331,23 +331,8 @@
         const folderPath = "data_reportes"; 
         const fileName = `${area.replace(/[^a-zA-Z0-9]/g, '_')}_${gerencia.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.json`;
         
-        // Inserta tu Token Personal de GitHub aquí
+        // Token configurado directamente (respaldo local eliminado)
         const githubToken = "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"; 
-
-        // Condición corregida: solo se activa si dejamos el texto de prueba "GITHUB_PERSONAL"
-        if(githubToken.includes("EMPETROLERARORAIMA")) {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", fileName);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            alert("¡Reporte generado! (Modo local: configure su token de GitHub en el código para almacenamiento automático en la nube).");
-            location.reload();
-            return;
-        }
 
         const jsonString = JSON.stringify(payload, null, 2);
         const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
